@@ -33,3 +33,6 @@ download_wiktionary_fr:
 	fi;
 
 maintenance: update download_wikipedia_fr download_wiktionary_fr stop start
+
+install_cron:
+	echo "0 7 * * * $${USER} cd $$(pwd) && make maintenance" | sudo tee /etc/cron.d/kiwix-server_maintenance
