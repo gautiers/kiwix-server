@@ -1,0 +1,9 @@
+services:
+  kiwix:
+    command: '"*.zim"'
+    image: ghcr.io/kiwix/kiwix-serve
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    volumes:
+      - './zim_files:/data'
