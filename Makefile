@@ -31,3 +31,5 @@ download_wiktionary_fr:
 		rm ./zim_files/$${BASE_FILE}_latest.zim; \
 		ln -s $${LATEST} ./zim_files/$${BASE_FILE}_latest.zim; \
 	fi;
+
+maintenance: update download_wikipedia_fr download_wiktionary_fr stop start
