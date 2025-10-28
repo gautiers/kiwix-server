@@ -55,8 +55,8 @@ download_wikimed_fr:
 maintenance: update download_wikipedia_fr download_wiktionary_fr download_wikiquote_fr download_wikimed_fr stop start
 
 install_prerequisites:
-	sudo apt install -y wget curl moreutils
+	sudo apt install -y wget curl
 
 install_cron:
-	echo "0 7 * * * $${USER} cd $$(pwd) && make maintenance 2>&1 | ts '\%F \%T' >> $$(pwd)/logs/maintenance_cron.log" \
+	echo "0 7 * * * $${USER} cd $$(pwd) && make maintenance 2>&1 | sed \"s|^|\$$(date -Iseconds) |\" >> $$(pwd)/logs/maintenance_cron.log" \
 		| sudo tee /etc/cron.d/kiwix-server_maintenance
