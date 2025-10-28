@@ -1,0 +1,18 @@
+[Unit]
+Description=Kiwix server container
+
+[Container]
+Image=ghcr.io/kiwix/kiwix-serve
+Volume=/data/kiwix-server/zim_files:/data
+PublishPort=8080:8080
+Exec=*_latest.zim
+LogDriver=passthrough
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+StandardOutput=append:/data/kiwix-server/logs/container.log
+StandardError=append:/data/kiwix-server/logs/container.log
+
+[Install]
+WantedBy=default.target

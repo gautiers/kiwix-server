@@ -4,13 +4,16 @@ SHELL := /bin/bash
 .SILENT:
 
 start:
-	docker compose up -d
+	systemctl --user start kiwix-server.service
 
 stop:
-	docker compose down
+	systemctl --user stop kiwix-server.service
+
+status:
+	systemctl --user status kiwix-server.service
 
 update:
-	docker compose pull
+	podman pull ghcr.io/kiwix/kiwix-serve
 
 download_wikipedia_fr:
 	BASE_URL=https://dumps.wikimedia.org/other/kiwix/zim/wikipedia/; \
@@ -55,7 +58,15 @@ download_wikimed_fr:
 maintenance: update download_wikipedia_fr download_wiktionary_fr download_wikiquote_fr download_wikimed_fr stop start
 
 install_prerequisites:
-	sudo apt install -y wget curl
+	sudo apt install -y wget curl podman
+
+install_service:
+	sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 gautiers
+	podman system migrate
+	sudo mkdir -p /etc/containers/systemd/users/1000
+	-sudo rm /etc/containers/systemd/users/1000/kiwix-server.container 2>/dev/null
+	sudo ln -s $$(pwd)/kiwix-server.container /etc/containers/systemd/users/1000/kiwix-server.container
+	systemctl --user daemon-reload
 
 install_cron:
 	echo "0 7 * * * $${USER} cd $$(pwd) && make maintenance 2>&1 | sed \"s|^|\$$(date -Iseconds) |\" >> $$(pwd)/logs/maintenance_cron.log" \
