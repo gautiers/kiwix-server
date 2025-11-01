@@ -61,11 +61,12 @@ install_prerequisites:
 	sudo apt install -y wget curl podman
 
 install_service:
-	sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 gautiers
+	sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $${USER}
 	podman system migrate
-	sudo mkdir -p /etc/containers/systemd/users/1000
-	-sudo rm /etc/containers/systemd/users/1000/kiwix-server.container 2>/dev/null
-	sudo ln -s $$(pwd)/kiwix-server.container /etc/containers/systemd/users/1000/kiwix-server.container
+	sudo mkdir -p /etc/containers/systemd/users/$${UID}
+	cat kiwix-server.container.template \
+		| sed "s|{KIWIX-SERVER_BASE}|$$(pwd)|g" \
+		| sudo tee /etc/containers/systemd/users/$${UID}/kiwix-server.container >/dev/null
 	systemctl --user daemon-reload
 
 install_cron:
