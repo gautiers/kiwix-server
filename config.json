@@ -1,0 +1,20 @@
+{
+    "zim_files": [
+        {
+            "base_url": "https://dumps.wikimedia.org/other/kiwix/zim/wikipedia/",
+            "base_file": "wikipedia_fr_all_nopic"
+        },
+        {
+            "base_url": "https://dumps.wikimedia.org/other/kiwix/zim/wiktionary/",
+            "base_file": "wiktionary_fr_all_nopic"
+        },
+        {
+            "base_url": "https://dumps.wikimedia.org/other/kiwix/zim/wikiquote/",
+            "base_file": "wikiquote_fr_all_nopic"
+        },
+        {
+            "base_url": "https://download.kiwix.org/zim/wikipedia/",
+            "base_file": "wikipedia_fr_medicine_maxi"
+        }
+    ]
+}
