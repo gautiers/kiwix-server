@@ -14,7 +14,9 @@ Offline Wikipedia or any zim file
 
 ## Install
 
-On a Debian-based Linux (Debian, Ubuntu, Linux Mint, ...) logged in with the user you want to run the kiwix server with.
+- On a Debian-based Linux (Debian, Ubuntu, Linux Mint, ...)
+- Logged in with the user you want kiwix-server to run with
+- In the directory you want kiwix-server to be installed in
 
 ```
 sudo apt-get install git make
