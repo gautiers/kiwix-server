@@ -31,7 +31,7 @@ update_zim_files:
 	done;
 
 install_prerequisites:
-	sudo apt install -y wget curl jq podman
+	sudo apt-get install -y wget curl jq podman sudo
 
 install_service:
 	sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $${USER}
