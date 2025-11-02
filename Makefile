@@ -4,9 +4,11 @@ SHELL := /bin/bash
 .SILENT:
 
 start:
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$${UID}/bus \
 	systemctl --user start kiwix-server.service
 
 stop:
+	DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$${UID}/bus \
 	systemctl --user stop kiwix-server.service
 
 status:
@@ -71,4 +73,4 @@ install_service:
 
 install_cron:
 	echo "0 7 * * * $${USER} cd $$(pwd) && make maintenance 2>&1 | sed \"s|^|\$$(date -Iseconds) |\" >> $$(pwd)/logs/maintenance_cron.log" \
-		| sudo tee /etc/cron.d/kiwix-server_maintenance
+		| sudo tee /etc/cron.d/kiwix-server_maintenance >/dev/null
