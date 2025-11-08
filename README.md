@@ -5,8 +5,9 @@ Offline Wikipedia or any zim file
 - [Kiwix](https://kiwix.org)
 - [Podman](https://podman.io) with systemd
 - [jq](https://jqlang.org) for reading configuration file
+- [curl](https://curl.se/) for downloading files
 - [Makefile](https://www.gnu.org/software/make/manual/make.html) as a bash runner
-- cron for regular auto-update
+- [cron](https://fr.wikipedia.org/wiki/Cron) for regular auto-update
 
 ## Features
 - Configurable zim files sources
