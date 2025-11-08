@@ -41,7 +41,7 @@ update_zim_files:
 		LATEST=$$(curl --silent $${BASE_URL} | grep $${BASE_FILE} | tail -n 1 | sed -r 's/.*href="([^"]+).*/\1/g')
 		if ! runas [ -f "${RUN_DIR}/zim_files/$${LATEST}" ]; then
 			echo "downloading $${LATEST}"
-			runas curl --output ${RUN_DIR}/zim_files/$${LATEST} --silent $${BASE_URL}$${LATEST}
+			runas curl --location --output ${RUN_DIR}/zim_files/$${LATEST} --silent $${BASE_URL}$${LATEST}
 			runas [ -f ${RUN_DIR}/zim_files/$${BASE_FILE}_latest.zim ] && runas rm ${RUN_DIR}/zim_files/$${BASE_FILE}_latest.zim
 			runas ln -s $${LATEST} ${RUN_DIR}/zim_files/$${BASE_FILE}_latest.zim
 			sleep 1
