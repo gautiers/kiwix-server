@@ -72,6 +72,7 @@ update: update_software update_zim_files stop start
 install: install_prerequisites install_service install_cron update
 uninstall: stop
 	$(include_runas)
+	sudo rm /etc/cron.d/kiwix-server_update
 	sudo rm -rf /etc/containers/systemd/users/$$(id -u ${RUN_USER})
 	runas systemctl --user daemon-reload
 	sudo loginctl disable-linger ${RUN_USER}
