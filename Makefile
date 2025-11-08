@@ -41,7 +41,7 @@ update_zim_files:
 		LATEST=$$(curl --silent $${BASE_URL} | grep $${BASE_FILE} | tail -n 1 | sed -r 's/.*href="([^"]+).*/\1/g')
 		if ! runas [ -f "${RUN_DIR}/zim_files/$${LATEST}" ]; then
 			echo "downloading $${LATEST}"
-			runas wget --directory-prefix=${RUN_DIR}/zim_files/ --output-file=/dev/null $${BASE_URL}$${LATEST}
+			runas curl --output ${RUN_DIR}/zim_files/$${LATEST} --silent $${BASE_URL}$${LATEST}
 			runas [ -f ${RUN_DIR}/zim_files/$${BASE_FILE}_latest.zim ] && runas rm ${RUN_DIR}/zim_files/$${BASE_FILE}_latest.zim
 			runas ln -s $${LATEST} ${RUN_DIR}/zim_files/$${BASE_FILE}_latest.zim
 			sleep 1
@@ -49,12 +49,11 @@ update_zim_files:
 	done
 
 install_prerequisites:
-	sudo apt-get install -y wget curl jq podman sudo >/dev/null
+	sudo apt-get install -y curl jq podman sudo >/dev/null
 
 install_service:
 	$(include_runas)
-	getent passwd ${RUN_USER} >/dev/null || sudo useradd --system --add-subids-for-system ${RUN_USER} --create-home
-	sudo loginctl enable-linger ${RUN_USER}
+	getent passwd ${RUN_USER} >/dev/null || sudo useradd --system --add-subids-for-system ${RUN_USER} --home-dir ${RUN_DIR} --shell /sbin/nologin
 	sudo mkdir -p ${RUN_DIR}/{logs,zim_files}
 	sudo cp config.json ${RUN_DIR}/
 	sudo chown -R $$(id -u ${RUN_USER}):$$(id -g ${RUN_USER}) ${RUN_DIR}
@@ -62,7 +61,7 @@ install_service:
 	cat kiwix-server.container.template \
 		| sed "s|{KIWIX-SERVER_BASE}|${RUN_DIR}|g" \
 		| sudo tee /etc/containers/systemd/users/$$(id -u ${RUN_USER})/kiwix-server.container >/dev/null
-	sleep 1
+	sudo loginctl enable-linger ${RUN_USER} && sleep 2
 	runas systemctl --user daemon-reload
 
 install_cron:
@@ -76,8 +75,7 @@ uninstall: stop
 	sudo rm /etc/cron.d/kiwix-server_update
 	sudo rm -rf /etc/containers/systemd/users/$$(id -u ${RUN_USER})
 	runas systemctl --user daemon-reload
-	sudo loginctl disable-linger ${RUN_USER}
-	sleep 1
+	sudo loginctl disable-linger ${RUN_USER} && sleep 2
 	sudo userdel --remove ${RUN_USER} 2>/dev/null
 	sudo rm -rf ${RUN_DIR}
 
