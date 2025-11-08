@@ -27,7 +27,7 @@ stop:
 
 status:
 	$(include_runas)
-	runas systemctl --user status kiwix-server.service
+	runas systemctl --user status kiwix-server.service || true
 
 update_software:
 	$(include_runas)
