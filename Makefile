@@ -8,7 +8,7 @@ RUN_DIR := $$(pwd)/run
 
 define include_runas
 	runas () {
-		ENV_VARS="XDG_RUNTIME_DIR=/run/user/$$(id -u ${RUN_USER})"
+		ENV_VARS=( "XDG_RUNTIME_DIR=/run/user/$$(id -u ${RUN_USER})" )
 		if [ "$$(id -un)" == "${RUN_USER}" ]; then
 			env "$${ENV_VARS[@]}" "$$@"
 		else
