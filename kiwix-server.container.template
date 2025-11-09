@@ -13,8 +13,9 @@ UserNS=keep-id:uid=100,gid=101
 Restart=always
 SuccessExitStatus=143
 TimeoutStartSec=900
-StandardOutput=append:{KIWIX-SERVER_BASE}/logs/container.log
-StandardError=append:{KIWIX-SERVER_BASE}/logs/container.log
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=kiwix-server
 
 [Install]
 WantedBy=default.target

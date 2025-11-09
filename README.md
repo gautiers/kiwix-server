@@ -8,6 +8,7 @@ Offline Wikipedia or any zim file
 - [curl](https://curl.se/) for downloading files
 - [Makefile](https://www.gnu.org/software/make/manual/make.html) as a bash runner
 - [cron](https://fr.wikipedia.org/wiki/Cron) for regular auto-update
+- [rsyslog](https://www.rsyslog.com/) for container systemd logging
 
 ## Features
 - Configurable zim files sources
@@ -44,3 +45,10 @@ make install
 ```
 Open http://127.0.0.1:8080
 
+## Uninstall
+
+```
+make uninstall
+```
+
+- Downloaded zim files will be deleted

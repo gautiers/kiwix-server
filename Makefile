@@ -49,14 +49,32 @@ update_zim_files:
 	done
 
 install_prerequisites:
-	sudo apt-get install -y curl jq podman sudo >/dev/null
+	sudo apt-get install -y curl jq podman rsyslog >/dev/null
 
-install_service:
-	$(include_runas)
-	getent passwd ${RUN_USER} >/dev/null || sudo useradd --system --add-subids-for-system ${RUN_USER} --home-dir ${RUN_DIR} --shell /sbin/nologin
+install_user:
+	getent passwd ${RUN_USER} >/dev/null \
+		|| sudo useradd \
+					--system \
+					--add-subids-for-system ${RUN_USER} \
+					--home-dir ${RUN_DIR} \
+					--shell /sbin/nologin
+
+install_files:
 	sudo mkdir -p ${RUN_DIR}/{logs,zim_files}
 	sudo cp config.json ${RUN_DIR}/
 	sudo chown -R $$(id -u ${RUN_USER}):$$(id -g ${RUN_USER}) ${RUN_DIR}
+
+install_logs:
+	$(include_runas)
+	echo -e ":syslogtag, startswith, \"kiwix-server\" /var/log/kiwix-server.log\n& stop" \
+		| sudo tee /etc/rsyslog.d/10-kiwix-server.conf >/dev/null
+	sudo systemctl restart rsyslog.service
+	runas [ ! -f ${RUN_DIR}/logs/container.log ] \
+		&& runas ln -s /var/log/kiwix-server.log ${RUN_DIR}/logs/container.log
+	true
+
+install_service:
+	$(include_runas)
 	sudo mkdir -p /etc/containers/systemd/users/$$(id -u ${RUN_USER})
 	cat kiwix-server.container.template \
 		| sed "s|{KIWIX-SERVER_BASE}|${RUN_DIR}|g" \
@@ -69,7 +87,7 @@ install_cron:
 		| sudo tee /etc/cron.d/kiwix-server_update >/dev/null
 
 update: update_software update_zim_files stop start
-install: install_prerequisites install_service install_cron update
+install: install_prerequisites install_user install_files install_logs install_service install_cron update
 uninstall: stop
 	$(include_runas)
 	sudo rm /etc/cron.d/kiwix-server_update
@@ -77,6 +95,9 @@ uninstall: stop
 	runas systemctl --user daemon-reload
 	sudo loginctl disable-linger ${RUN_USER} && sleep 2
 	sudo userdel --remove ${RUN_USER} 2>/dev/null
+	sudo rm /etc/rsyslog.d/10-kiwix-server.conf
+	sudo systemctl restart rsyslog.service
+	sudo rm /var/log/kiwix-server.log
 	sudo rm -rf ${RUN_DIR}
 
 
