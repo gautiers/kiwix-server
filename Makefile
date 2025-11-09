@@ -27,7 +27,7 @@ stop:
 
 status:
 	$(include_runas)
-	runas systemctl --user status kiwix-server.service || true
+	runas systemctl --user status kiwix-server.service || /bin/true
 
 update_software:
 	$(include_runas)
@@ -71,8 +71,8 @@ install_logs:
 		| sudo tee /etc/rsyslog.d/10-kiwix-server.conf >/dev/null
 	sudo systemctl restart rsyslog.service
 	runas [ ! -f ${RUN_DIR}/logs/container.log ] \
-		&& runas ln -s /var/log/kiwix-server.log ${RUN_DIR}/logs/container.log
-	true
+		&& runas ln -s /var/log/kiwix-server.log ${RUN_DIR}/logs/container.log \
+		|| /bin/true
 
 install_service:
 	$(include_runas)
@@ -88,7 +88,9 @@ install_cron:
 		| sudo tee /etc/cron.d/kiwix-server_update >/dev/null
 
 update: update_software update_zim_files stop start
+
 install: install_prerequisites install_user install_files install_logs install_service install_cron update
+
 uninstall: stop
 	$(include_runas)
 	sudo rm /etc/cron.d/kiwix-server_update
@@ -100,6 +102,3 @@ uninstall: stop
 	sudo systemctl restart rsyslog.service
 	sudo rm /var/log/kiwix-server.log
 	sudo rm -rf ${RUN_DIR}
-
-
-
