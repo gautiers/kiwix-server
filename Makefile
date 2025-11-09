@@ -55,9 +55,10 @@ install_user:
 	getent passwd ${RUN_USER} >/dev/null \
 		|| sudo useradd \
 					--system \
-					--add-subids-for-system ${RUN_USER} \
+					--add-subids-for-system \
 					--home-dir ${RUN_DIR} \
-					--shell /sbin/nologin
+					--shell /sbin/nologin \
+					${RUN_USER}
 
 install_files:
 	sudo mkdir -p ${RUN_DIR}/{logs,zim_files}
