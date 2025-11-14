@@ -64,15 +64,17 @@ install_files:
 	sudo mkdir -p ${RUN_DIR}/{logs,zim_files}
 	sudo cp config.json ${RUN_DIR}/
 	sudo chown -R $$(id -u ${RUN_USER}):$$(id -g ${RUN_USER}) ${RUN_DIR}
+	sudo chown syslog:adm ${RUN_DIR}/logs/container.* 2>/dev/null || /bin/true
 
 install_logs:
-	$(include_runas)
-	echo -e ":syslogtag, startswith, \"kiwix-server\" /var/log/kiwix-server.log\n& stop" \
+	sudo chgrp syslog "${RUN_DIR}/logs"
+	sudo chmod g+w "${RUN_DIR}/logs"
+	echo "${RUN_DIR}/logs/* rw," \
+		| sudo tee /etc/apparmor.d/rsyslog.d/kiwix-server >/dev/null
+	echo -e ":syslogtag, startswith, \"kiwix-server\" ${RUN_DIR}/logs/container.log\n& stop" \
 		| sudo tee /etc/rsyslog.d/10-kiwix-server.conf >/dev/null
+	sudo systemctl reload apparmor.service
 	sudo systemctl restart rsyslog.service
-	runas [ ! -f ${RUN_DIR}/logs/container.log ] \
-		&& runas ln -s /var/log/kiwix-server.log ${RUN_DIR}/logs/container.log \
-		|| /bin/true
 
 install_service:
 	$(include_runas)
@@ -98,7 +100,8 @@ uninstall: stop
 	runas systemctl --user daemon-reload
 	sudo loginctl disable-linger ${RUN_USER} && sleep 2
 	sudo userdel --remove ${RUN_USER} 2>/dev/null
+	sudo rm /etc/apparmor.d/rsyslog.d/kiwix-server
 	sudo rm /etc/rsyslog.d/10-kiwix-server.conf
+	sudo systemctl reload apparmor.service
 	sudo systemctl restart rsyslog.service
-	sudo rm /var/log/kiwix-server.log
 	sudo rm -rf ${RUN_DIR}
